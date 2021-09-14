@@ -2,6 +2,7 @@
 extern crate rand;
 
 mod agent;
+mod util;
 
 use rand::Rng;
 

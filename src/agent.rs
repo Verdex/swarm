@@ -34,13 +34,24 @@ impl SortAbility {
         index_1 && index_2 && value_1 && value_2
     }
 
-    pub fn move_towards(&mut self, goal : &Self) {
+    pub fn move_towards(&mut self, goal : &Self, dist : u8) {
+        fn new_value(src : u8, dest : u8, max : u8) -> u8 {
+            use std::cmp::min;
+            let magnitude = min((dest as i16 - src as i16).abs() as u8, max);
+            if dest < src {
+                dest + magnitude
+            }
+            else {
+                dest - magnitude
+            }
+        }
 
+        self.index_1 = new_value(self.index_1, goal.index_1, dist);
+        self.index_2 = new_value(self.index_2, goal.index_2, dist);
+        self.value_1 = new_value(self.value_1, goal.value_1, dist);
+        self.value_2 = new_value(self.value_2, goal.value_2, dist);
     }
 }
-
-
- 
 
 #[derive(Debug)]
 pub struct Agent {

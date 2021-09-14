@@ -30,18 +30,10 @@ fn pick_indices<T:Rng>( rng : &mut T, options : &Vec<u8> ) -> (u8, u8) {
     (i1, i2)
 }
 
-
-fn main() {
-    let mut rng = rand::thread_rng();
-
-    let mut agent = Agent::new(&mut rng);
-
-    let mut array = gen(&mut rng);
-    println!("{:?}", array);
-
+fn proc<T : Rng>( rng : &mut T, agent : &mut Agent, array : &mut [u8] ) {
     match agent.act() {
         Action::Act => {
-            let (i1, i2) = pick_indices(&mut rng, &agent.index_affinity);
+            let (i1, i2) = pick_indices(rng, &agent.index_affinity);
             let v1 = array[i1 as usize];
             let v2 = array[i2 as usize];
             if agent.sort_ability.flip(i1, i2, v1, v2) {
@@ -55,6 +47,20 @@ fn main() {
         Action::Observe => panic!("observe"),
         Action::Influence => panic!("influence"),
     }
+}
+
+fn main() {
+    let mut rng = rand::thread_rng();
+
+    let mut agent = Agent::new(&mut rng);
+
+    let mut array = gen(&mut rng);
+    println!("{:?}", array);
+
+    
+    proc(&mut rng, &mut agent, &mut array);
+
+
 
     println!("{:?}", array);
     println!("{:?}", agent);

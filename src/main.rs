@@ -50,19 +50,39 @@ fn proc<T : Rng>( rng : &mut T, agent : &mut Agent, array : &mut [u8] ) {
     }
 }
 
+fn prune<T : Rng>(rng : &mut T, agents : &mut Vec<Agent>, count : usize) {
+    for _ in 0..count {
+        let target_index = rng.gen_range(0..agents.len());
+        agents.remove(target_index);
+    }
+}
+
+fn failure_rate(orig : [u8; 8], attempt : [u8; 8]) -> f32 {
+    let mut sorted = orig.clone();
+    sorted.sort();
+
+    let mut rev = sorted.clone();
+    rev.reverse();
+
+    util::lev(&attempt, &sorted) as f32 / util::lev(&sorted, &rev) as f32
+}
+
 fn main() {
+    const agent_count : usize = 30;
+
     let mut rng = rand::thread_rng();
 
-    let mut agent = Agent::new(&mut rng);
+    let mut agents : Vec<Agent> = (0..agent_count).map( |_| Agent::new(&mut rng) ).collect();
 
-    let mut array = gen(&mut rng);
-    println!("{:?}", array);
-
+    let array = gen(&mut rng);
+    let mut attempt = array.clone();
     
-    proc(&mut rng, &mut agent, &mut array);
+    for mut agent in &mut agents {
+        proc(&mut rng, &mut agent, &mut attempt);
+    }
 
+    prune(&mut rng, &mut agents, (failure_rate(array, attempt) * agent_count as f32) as usize);
 
+    println!("{:?}", agents.len());
 
-    println!("{:?}", array);
-    println!("{:?}", agent);
 }
